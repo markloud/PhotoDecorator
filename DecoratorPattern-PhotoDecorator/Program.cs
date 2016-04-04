@@ -7,6 +7,9 @@ using System.Windows.Forms;
 
 namespace DecoratorPattern_PhotoDecorator
 {
+    /// <summary>
+    /// Client
+    /// </summary>
     static class Program
     {
         /// <summary>
@@ -15,18 +18,18 @@ namespace DecoratorPattern_PhotoDecorator
         [STAThread]
         static void Main() // acts as a simple client
         {
+            // declare component and decorators
             Photo photo;
-            TaggedPhoto foodTaggedPhoto, colorTaggedPhoto, tag;
+            TaggedPhoto colorTaggedPhoto, tag;
             BorderedPhoto composition;
 
             photo = new Photo();
             Application.Run(new Photo());
-
-            foodTaggedPhoto = new TaggedPhoto(photo, "Food");
-            colorTaggedPhoto = new TaggedPhoto(foodTaggedPhoto, "Yellow");
+            
+            colorTaggedPhoto = new TaggedPhoto(new TaggedPhoto(new TaggedPhoto(photo, "Mountain"), "breeze"), "Yellow");
             composition = new BorderedPhoto(colorTaggedPhoto, Color.Blue);
             Application.Run(composition);
-            MessageBox.Show(colorTaggedPhoto.ListTaggedPhotos());
+            colorTaggedPhoto.AddedBehavior();
 
             photo = new Photo();
             tag = new TaggedPhoto(photo, "Tent");

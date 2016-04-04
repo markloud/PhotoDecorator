@@ -5,7 +5,18 @@ using System.Windows.Forms;
 
 namespace DecoratorPattern_PhotoDecorator
 {
-    public partial class Photo : Form
+    /// <summary>
+    /// IComponent Interface
+    /// </summary>
+    interface IDrawable
+    {
+        void Drawer(Object source, PaintEventArgs e);
+    }
+
+    /// <summary>
+    /// Component
+    /// </summary>
+    public partial class Photo : Form, IDrawable
     {
         private Image image;
 
@@ -15,63 +26,68 @@ namespace DecoratorPattern_PhotoDecorator
             Size = new Size(1050, 650);
             Text = "Tent";
             Paint += new PaintEventHandler(Drawer);
-            InitializeComponent();
         }
 
-        public virtual void Drawer(Object source, PaintEventArgs e)
+        public void Drawer(Object source, PaintEventArgs e)
         {
             e.Graphics.DrawImage(image, 30, 20);
         }
     }
 
-    internal class BorderedPhoto : Photo // decorator with no interface, requires the operation to be virtual
+    /// <summary>
+    /// Decorator
+    /// </summary>
+    internal class BorderedPhoto : Photo, IDrawable // decorator with no interface, requires the operation to be virtual
     {
-        private Photo photo;
-        private Color color;
+        IDrawable photo;
+        Color color;
 
-        public BorderedPhoto(Photo p, Color c)
+        public BorderedPhoto(IDrawable p, Color c)
         {
             photo = p;
             color = c;
+            Paint += new PaintEventHandler(Drawer);
         }
 
-        public override void Drawer(Object source, PaintEventArgs e)
+        new public void Drawer(Object source, PaintEventArgs e)
         {
             photo.Drawer(source, e);
             e.Graphics.DrawRectangle(new Pen(color, 10), 25, 15, 970, 550);
         }
     }
 
-    internal class TaggedPhoto : Photo
+    /// <summary>
+    /// Decorator with added behavior
+    /// </summary>
+    class TaggedPhoto : Photo, IDrawable
     {
-        private Photo photo;
-        private string tag;
-        private int number;
-        private static int count;
-        private List<string> tags = new List<string>();
+        IDrawable photo;
+        string tag;
+        int number;
+        static int count;
+        List<string> tags = new List<string>();
 
-        public TaggedPhoto(Photo p, string t)
+        public TaggedPhoto(IDrawable p, string t)
         {
             photo = p;
             tag = t;
             tags.Add(t);
             number = ++count;
+            Paint += new PaintEventHandler(Drawer);
         }
 
-        public override void Drawer(object source, PaintEventArgs e)
+        new public void Drawer(object source, PaintEventArgs e)
         {
-            base.Drawer(source, e);
+            photo.Drawer(source, e);
             e.Graphics.DrawString(tag,
                 new Font("Arial", 16),
                 new SolidBrush(Color.Black),
                 new Point(120, 150 + number * 20));
         }
 
-        public string ListTaggedPhotos()
+        public void AddedBehavior() // Added Behavior
         {
-            var s = "Tags are: ";
-            foreach (string t in tags) s += t + "";
-            return s;
+            MessageBox.Show("Added Behavior from Tagged Photos Object");
         }
     }
 }
